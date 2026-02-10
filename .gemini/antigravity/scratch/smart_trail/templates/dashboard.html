@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartTrail Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <header style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <i class="fas fa-suitcase-rolling" style="color: var(--accent); font-size: 1.5rem;"></i>
+                <h2 style="font-weight: 600;">SmartTrail Dashboard</h2>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <span id="clock" style="color: var(--text-muted);">12:00 PM</span>
+                <div style="background: rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 20px;">
+                    <i class="fas fa-user-circle"></i> Shiva
+                </div>
+            </div>
+        </header>
+
+        <div class="dashboard-grid glass-card">
+            <!-- Video Feed Section -->
+            <div class="video-feed">
+                <div class="recording-indicator">
+                    <div class="dot"></div>
+                    <span>LIVE VISION</span>
+                </div>
+                <img src="{{ url_for('video_feed') }}" alt="SmartTrail Vision Feed">
+            </div>
+
+            <!-- Controls Section -->
+            <div class="controls-panel">
+                <div class="status-card">
+                    <div class="status-label">CURRENT STATUS</div>
+                    <div class="status-value" id="status-text">Idle</div>
+                </div>
+
+                <div class="status-card">
+                    <div class="status-label">BATTERY LEVEL</div>
+                    <div class="status-value" id="battery-level">98%</div>
+                    <div
+                        style="width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; margin-top: 10px;">
+                        <div id="battery-bar"
+                            style="width: 98%; height: 100%; background: var(--accent); border-radius: 3px;"></div>
+                    </div>
+                </div>
+
+                <div style="flex-grow: 1;"></div>
+
+                <button class="control-btn" onclick="sendCommand('follow')">
+                    <i class="fas fa-walking"></i> Follow Me
+                </button>
+
+                <button class="control-btn stop" onclick="sendCommand('stop')">
+                    <i class="fas fa-hand-paper"></i> STOP
+                </button>
+
+                <div style="height: 1px; background: var(--glass-border); margin: 0.5rem 0;"></div>
+
+                <button class="control-btn" id="privacyBtn" onclick="togglePrivacy()">
+                    <i class="fas fa-eye-slash"></i> Privacy Mode (Off)
+                </button>
+
+                <button class="control-btn stop"
+                    style="border-color: var(--accent); color: var(--accent); background: rgba(0, 210, 255, 0.1);"
+                    onclick="endRide()">
+                    <i class="fas fa-flag-checkered"></i> End Ride
+                </button>
+
+                <button class="control-btn" onclick="sendCommand('return')">
+                    <i class="fas fa-home"></i> Return to Base
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isPrivacyOn = false;
+
+        function togglePrivacy() {
+            isPrivacyOn = !isPrivacyOn;
+            const btn = document.getElementById('privacyBtn');
+
+            fetch('/api/camera_control', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ on: !isPrivacyOn })
+            });
+
+            if (isPrivacyOn) {
+                btn.innerHTML = '<i class="fas fa-eye"></i> Resume Camera';
+                btn.style.background = "var(--primary)";
+            } else {
+                btn.innerHTML = '<i class="fas fa-eye-slash"></i> Privacy Mode';
+                btn.style.background = "rgba(255, 255, 255, 0.05)";
+            }
+        }
+
+        function endRide() {
+            if (confirm("Are you sure you want to end the session?")) {
+                window.location.href = "/end_ride";
+            }
+        }
+
+        function sendCommand(action) {
+            fetch('/api/control', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ action: action }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    updateUI(data.robot_state);
+                });
+        }
+
+        function updateUI(state) {
+            document.getElementById('status-text').innerText = state.status;
+            document.getElementById('battery-level').innerText = Math.round(state.battery) + "%";
+            document.getElementById('battery-bar').style.width = state.battery + "%";
+        }
+
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        setInterval(updateTime, 1000);
+
+        // Poll status every 2 seconds
+        setInterval(() => {
+            fetch('/api/status')
+                .then(r => r.json())
+                .then(updateUI);
+        }, 2000);
+
+        updateTime();
+    </script>
+</body>
+
+</html>

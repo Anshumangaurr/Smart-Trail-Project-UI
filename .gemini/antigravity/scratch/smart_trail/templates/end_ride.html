@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ride Ended</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="glass-card rental-card" style="text-align: center;">
+            <div style="color: #4cd964; margin-bottom: 2rem;">
+                <i class="fas fa-check-circle" style="font-size: 5rem;"></i>
+            </div>
+
+            <h2 style="margin-bottom: 1rem;">Ride Completed</h2>
+            <p class="subtitle" style="font-size: 1rem; margin-bottom: 2rem;">
+                Thank you for using SmartTrail.
+            </p>
+
+            <div class="status-card" style="margin-bottom: 2rem; text-align: left;">
+                <div class="status-label">PLEASE PARK AT</div>
+                <div class="status-value" style="color: var(--accent);">Zone A - Station 4</div>
+                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">
+                    Nearest station is 50m ahead on your right.
+                </div>
+            </div>
+
+            <a href="/" class="btn-primary" style="background: rgba(255,255,255,0.1); width: 100%;">
+                Back to Home screen
+            </a>
+        </div>
+    </div>
+</body>
+
+</html>
