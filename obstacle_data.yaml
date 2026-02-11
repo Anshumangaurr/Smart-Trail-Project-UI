@@ -1,0 +1,9 @@
+path: ./data/obstacles  # Root of your obstacle dataset
+
+train: images/train     # Relative to 'path'
+val: images/val         # Relative to 'path'
+
+# Single-class example; extend as needed.
+names:
+  0: obstacle
+
