@@ -7,10 +7,10 @@ from flask import Flask, render_template, Response, jsonify, request
 try:
     from camera import VideoCamera
 except ImportError as e:
+    # If the camera module or dependencies are missing, we can still run
+    # the web app; camera-related endpoints will return errors gracefully.
     print(f"Error importing VideoCamera: {e}")
     VideoCamera = None
-
-import time
 
 app = Flask(__name__)
 
@@ -92,11 +92,13 @@ def video_feed():
 @app.route('/api/camera_control', methods=['POST'])
 def camera_control():
     cam = get_camera()
-    if cam:
-        data = request.json
-        cam.set_running(data.get('on', True))
-        return jsonify({"status": "updated"})
-    return jsonify({"status": "error"}), 500
+    if cam is None:
+        return jsonify({"status": "error", "message": "Camera unavailable"}), 500
+
+    data = request.get_json(silent=True) or {}
+    should_run = bool(data.get('on', True))
+    cam.set_running(should_run)
+    return jsonify({"status": "updated", "running": should_run})
 
 @app.route('/api/control', methods=['POST'])
 def control():
@@ -123,6 +125,22 @@ def status():
         robot_state['battery'] = max(0.0, float(robot_state['battery']) - 0.01)
         
     return jsonify(robot_state)
+
+
+@app.route('/api/health')
+def health():
+    """
+    Simple health check endpoint for debugging.
+    Returns basic info about server, robot, and camera availability.
+    """
+    cam_available = get_camera() is not None
+    return jsonify(
+        {
+            "status": "ok",
+            "robot_state": robot_state,
+            "camera_available": cam_available,
+        }
+    )
 
 if __name__ == '__main__':
     # Use 0.0.0.0 to make it accessible to other devices if needed, but verify firewall.
