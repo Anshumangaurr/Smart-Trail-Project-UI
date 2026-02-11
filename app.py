@@ -49,16 +49,28 @@ def end_ride():
 
 @app.route('/api/toggle_camera', methods=['POST'])
 def toggle_camera():
-    if VideoCamera:
-        data = request.json
-        should_run = data.get('run', True)
-        # We need a way to access the specific instance used by video_feed
-        # Since we instantiate VideoCamera() in video_feed every time in the original code,
-        # we need to change how we handle the camera instance to persist state.
-        # But for this simple Flask structure, we can use a global flag or singleton pattern.
-        # Check 'global_camera' implementation below.
-        pass 
-    return jsonify({"status": "success"}) 
+    """
+    Toggle or explicitly set the camera running state.
+    Request body options (JSON):
+      - {"run": true}  -> force camera ON
+      - {"run": false} -> force camera OFF / privacy mode
+      - {} or no body  -> toggle current state
+    """
+    cam = get_camera()
+    if cam is None:
+        return jsonify({"status": "error", "message": "Camera unavailable"}), 500
+
+    data = request.get_json(silent=True) or {}
+
+    if "run" in data:
+        # Explicitly set the running state
+        should_run = bool(data["run"])
+    else:
+        # No explicit flag provided, just toggle based on current state
+        should_run = not getattr(cam, "is_running", True)
+
+    cam.set_running(should_run)
+    return jsonify({"status": "success", "running": should_run})
 
 # We need a proper singleton for the camera to toggle state effectively
 global_camera = None
