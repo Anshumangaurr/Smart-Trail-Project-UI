@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activating...</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="activation-container">
+            <div class="loader-ring"></div>
+            <h2 id="status-msg">Waking up the luggage...</h2>
+            <i class="fas fa-robot"
+                style="font-size: 3rem; margin-top: 2rem; color: var(--accent); animation: float 3s ease-in-out infinite;"></i>
+        </div>
+    </div>
+
+    <script>
+        const messages = [
+            "Waking up the luggage...",
+            "Calibrating wheels...",
+            "Feeding the internal hamster...",
+            "Polishing the camera lens...",
+            "Loading AI personality...",
+            "Ready to roll!"
+        ];
+
+        let i = 0;
+        const msgElement = document.getElementById('status-msg');
+
+        function updateMessage() {
+            if (i < messages.length) {
+                msgElement.innerText = messages[i];
+                i++;
+                setTimeout(updateMessage, 800);
+            } else {
+                window.location.href = "/dashboard";
+            }
+        }
+
+        updateMessage();
+    </script>
+</body>
+
+</html>
