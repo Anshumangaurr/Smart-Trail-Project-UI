@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rent SmartTrail</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="glass-card rental-card">
+            <h2 style="margin-bottom: 2rem;">Configure Your Ride</h2>
+
+            <div class="input-group">
+                <label>Select Duration (Hours)</label>
+                <div class="slider-container">
+                    <input type="range" min="1" max="12" value="2" class="slider" id="hourSlider"
+                        oninput="updateCost()">
+                    <span id="hourValue" class="value-display">2 hrs</span>
+                </div>
+            </div>
+
+            <div class="cost-display">
+                <span>Total:</span>
+                <span id="totalCost" style="color: var(--accent);">₹200</span>
+            </div>
+
+            <div id="payment-section" style="display: none; margin-top: 2rem; text-align: center;">
+                <div class="upi-mock">
+                    <i class="fas fa-qrcode" style="font-size: 5rem; margin-bottom: 1rem;"></i>
+                    <p>Scan to Pay via UPI</p>
+                    <div class="spinner"></div>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 10px;">Processing Payment...</p>
+                </div>
+            </div>
+
+            <button id="payBtn" class="btn-primary" onclick="showPayment()" style="width: 100%; margin-top: 2rem;">
+                Proceed to Pay
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function updateCost() {
+            const hours = document.getElementById('hourSlider').value;
+            document.getElementById('hourValue').innerText = hours + " hrs";
+            document.getElementById('totalCost').innerText = "₹" + (hours * 100);
+        }
+
+        function showPayment() {
+            document.getElementById('payBtn').style.display = 'none';
+            document.getElementById('payment-section').style.display = 'block';
+
+            // Simulate payment processing
+            setTimeout(() => {
+                window.location.href = "/activate";
+            }, 3000); // 3 seconds delay
+        }
+    </script>
+</body>
+
+</html>
